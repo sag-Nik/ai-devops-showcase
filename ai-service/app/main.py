@@ -97,7 +97,7 @@ def analyze_subreddit(req: SubredditRequest):
     filtered_counts = {k: v for k, v in counts.items() if v > 0}
 
     if filtered_counts:
-        colors_map = {"POSITIVE": "#34D399", "NEGATIVE": "#F87171", "NEUTRAL": "#FBBF24"}
+        colors_map = {"POSITIVE": "#15FF00", "NEGATIVE": "#ff4500", "NEUTRAL": "#FBBF24"}
         colors = [colors_map[k] for k in filtered_counts.keys()]
         explode = tuple(0.05 for _ in filtered_counts)  # slight separation
 

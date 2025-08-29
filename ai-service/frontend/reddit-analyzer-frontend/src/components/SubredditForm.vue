@@ -4,12 +4,12 @@
 
     <div class="form-group">
       <label>Subreddit:</label>
-      <input v-model="subreddit" placeholder="e.g., iPhone" required />
+      <input v-model="subreddit" placeholder="e.g., iPhone12, Macbookpro, Oktoberfest, TaylorSwift" required />
     </div>
 
     <div class="form-group">
       <label>Number of Posts: {{ top_n }}</label>
-      <input type="range" v-model.number="top_n" min="1" max="25" />
+      <input type="range" v-model.number="top_n" min="1" max="25" step="1" />
     </div>
 
     <div class="form-group">
@@ -74,20 +74,13 @@ async function analyzeSubreddit() {
   max-width: 700px;
   margin: 2rem auto;
   padding: 2rem;
-  background: #fff;
+  background: #dddada;
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   font-family: 'Inter', sans-serif;
-
-  .title {
-    text-align: center;
-    font-size: 1.75rem;
-    margin-bottom: 1rem;
-    color: #4f46e5;
-  }
 
   .form-group {
     display: flex;
@@ -96,23 +89,18 @@ async function analyzeSubreddit() {
     label {
       font-weight: 600;
       margin-bottom: 0.5rem;
+      color: #1c1c1c;
     }
 
-    input[type="text"],
-    input[type="number"] {
+    input {
       padding: 0.5rem 0.75rem;
       border-radius: 6px;
       border: 1px solid #ccc;
       transition: border-color 0.2s;
-
       &:focus {
-        border-color: #4f46e5;
+        border-color: #ff4500;
         outline: none;
       }
-    }
-
-    input[type="range"] {
-      width: 100%;
     }
   }
 
@@ -120,19 +108,17 @@ async function analyzeSubreddit() {
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
     border: none;
-    background-color: #4f46e5;
+    background-color: #ff4500;
     color: #fff;
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s;
-
-    &:disabled {
-      background-color: #a5b4fc;
-      cursor: not-allowed;
-    }
-
     &:hover:not(:disabled) {
-      background-color: #4338ca;
+      background-color: #e03d00;
+    }
+    &:disabled {
+      background-color: #f5a175;
+      cursor: not-allowed;
     }
   }
 
@@ -148,7 +134,7 @@ async function analyzeSubreddit() {
 
     .spinner {
       border: 4px solid #f3f3f3;
-      border-top: 4px solid #4f46e5;
+      border-top: 4px solid #ff4500;
       border-radius: 50%;
       width: 24px;
       height: 24px;
@@ -174,10 +160,11 @@ async function analyzeSubreddit() {
     padding: 1rem;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
-    background-color: #f9fafb;
+    background-color: #f8f9fa;
 
     h2 {
       margin-bottom: 0.5rem;
+      color: #1c1c1c;
     }
 
     img {
@@ -186,6 +173,15 @@ async function analyzeSubreddit() {
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      li {
+        margin-bottom: 0.25rem;
+      }
+    }
   }
 }
+
 </style>
