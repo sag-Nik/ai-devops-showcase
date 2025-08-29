@@ -15,7 +15,7 @@ import json
 OLLAMA_URL = "http://127.0.0.1:11434/api/generate"
 OLLAMA_MODEL = "mistral"
 
-# Sentence embedding model (CPU-friendly)
+# Sentence embedding model (CPU-friendly) for future improvements
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 app = FastAPI(title="Reddit Sentiment & Summary Analyzer")
