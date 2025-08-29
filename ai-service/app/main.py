@@ -66,8 +66,11 @@ sentiment_analyzer = pipeline(
 
 @app.post("/analyze")
 def analyze_subreddit_stream(req: SubredditRequest):
-    rss_url = f"https://www.reddit.com/r/{req.subreddit}/.rss"
-    feed = feedparser.parse(rss_url)
+    try:
+        rss_url = f"https://www.reddit.com/r/{req.subreddit}/.rss"
+        feed = feedparser.parse(rss_url)
+    except Exception:
+        raise HTTPException(status_code=400, detail="This is not a valid subreddit, therefore the URL creation failed.")
 
     if not feed.entries:
         raise HTTPException(status_code=404, detail="Subreddit not found or RSS feed empty")
@@ -75,7 +78,7 @@ def analyze_subreddit_stream(req: SubredditRequest):
     entries = feed.entries[:req.top_n]
     titles = [entry.title for entry in entries]
 
-    # Sentiment analysis (same as before)
+    # Sentiment analysis
     sentiments = [sentiment_analyzer(title)[0]['label'] for title in titles]
     counts = {"POSITIVE": 0, "NEGATIVE": 0, "NEUTRAL": 0}
     for s in sentiments:
@@ -92,8 +95,6 @@ def analyze_subreddit_stream(req: SubredditRequest):
     plt.title(f"Sentiment Analysis of /r/{req.subreddit} (last {req.top_n} posts)")
     plt.ylabel("Number of posts")
     plt.tight_layout()
-    graph_file = f"{req.subreddit}_sentiment.png"
-    #plt.savefig(graph_file)
     plt.close()
 
     # Mistral streaming
@@ -101,3 +102,4 @@ def analyze_subreddit_stream(req: SubredditRequest):
     prompt = f"Summarize the following Reddit posts in 3 concise sentences:\n{posts_text}. Dont respond with the summary, just speak about the overall sentiment."
 
     return StreamingResponse(query_mistral_stream(prompt, max_tokens=150), media_type="text/plain")
+
