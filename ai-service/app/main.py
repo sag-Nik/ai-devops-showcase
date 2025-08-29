@@ -10,8 +10,11 @@ import matplotlib.pyplot as plt
 from fastapi.responses import JSONResponse
 import base64
 from io import BytesIO
-import json
+import os
+from fastapi.middleware.cors import CORSMiddleware
 
+
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5174")
 OLLAMA_URL = "http://127.0.0.1:11434/api/generate"
 OLLAMA_MODEL = "mistral"
 
@@ -19,6 +22,14 @@ OLLAMA_MODEL = "mistral"
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 app = FastAPI(title="Reddit Sentiment & Summary Analyzer")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[FRONTEND_URL],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class SubredditRequest(BaseModel):

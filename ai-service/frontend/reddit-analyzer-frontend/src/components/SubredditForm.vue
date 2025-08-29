@@ -24,12 +24,6 @@
       <h2>Sentiment Graph</h2>
       <img :src="`data:image/png;base64,${result.sentiment_graph}`" alt="Sentiment graph" />
 
-      <h3>Counts</h3>
-      <ul>
-        <li>Positive: {{ result.counts.POSITIVE }}</li>
-        <li>Negative: {{ result.counts.NEGATIVE }}</li>
-        <li>Neutral: {{ result.counts.NEUTRAL }}</li>
-      </ul>
     </div>
   </form>
 </template>
