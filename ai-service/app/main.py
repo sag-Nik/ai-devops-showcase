@@ -108,7 +108,7 @@ def analyze_subreddit(req: SubredditRequest):
 
     # Mistral summary (non-streaming)
     posts_text = " ".join(titles)
-    prompt = f"Summarize the following Reddit posts in 3 concise sentences:\n{posts_text}."
+    prompt = f"Summarize the following Reddit posts:\n{posts_text}. \n Do not answer in bullet points or refer to any specific post. Summarize them altogether."
     summary = query_mistral(prompt, max_tokens=150)
 
     return JSONResponse(content={
