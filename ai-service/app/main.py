@@ -35,20 +35,18 @@ app.add_middleware(
 class SubredditRequest(BaseModel):
     subreddit: str
     top_n: int = 25
+    temperature: float = 0.5  
+    max_tokens: int = 150     
 
 
-def query_mistral(prompt: str, max_tokens: int = 150) -> str:
-    """
-    Query the running Ollama Mistral model via HTTP (non-streaming).
-    Returns the full text response.
-    """
+def query_mistral(prompt: str, max_tokens: int = 150, temperature: float = 0.5) -> str:
     payload = {
         "model": OLLAMA_MODEL,
         "prompt": prompt,
         "stream": False,
         "options": {
-            "temperature": 0.5,
-            "max_tokens": max_tokens
+            "temperature": temperature,
+            "num_predict": max_tokens
         }
     }
     headers = {"Content-Type": "application/json"}
@@ -57,6 +55,7 @@ def query_mistral(prompt: str, max_tokens: int = 150) -> str:
         return response.json().get("response", "")
     else:
         return f"Error: {response.status_code} - {response.text}"
+
 
 
 # Sentiment analysis model (CPU-friendly)
@@ -94,25 +93,50 @@ def analyze_subreddit(req: SubredditRequest):
             counts["NEUTRAL"] += 1
 
     # Plot sentiment distribution in memory
-    plt.figure(figsize=(6,4))
-    sns.barplot(x=list(counts.keys()), y=list(counts.values()), palette=["green", "red", "gray"])
-    plt.title(f"Sentiment Analysis of /r/{req.subreddit} (last {req.top_n} posts)")
-    plt.ylabel("Number of posts")
-    plt.tight_layout()
 
-    buf = BytesIO()
-    plt.savefig(buf, format="png")
-    plt.close()
-    buf.seek(0)
-    img_base64 = base64.b64encode(buf.read()).decode("utf-8")
+    filtered_counts = {k: v for k, v in counts.items() if v > 0}
 
-    # Mistral summary (non-streaming)
+    if filtered_counts:
+        colors_map = {"POSITIVE": "#34D399", "NEGATIVE": "#F87171", "NEUTRAL": "#FBBF24"}
+        colors = [colors_map[k] for k in filtered_counts.keys()]
+        explode = tuple(0.05 for _ in filtered_counts)  # slight separation
+
+        plt.figure(figsize=(6,6))
+        plt.pie(
+            filtered_counts.values(),
+            labels=filtered_counts.keys(),
+            autopct="%1.1f%%",
+            startangle=140,
+            colors=colors,
+            explode=explode,
+            shadow=True,
+            wedgeprops={'edgecolor': 'black', 'linewidth': 1}
+        )
+        plt.title(f"Sentiment Analysis of /r/{req.subreddit} (last {req.top_n} posts)",
+                fontsize=14, fontweight='bold', color='#111827')
+
+        plt.tight_layout()
+        
+        buf = BytesIO()
+        plt.savefig(buf, format='png', facecolor='white')
+        plt.close()
+        buf.seek(0)
+        img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    else:
+        img_base64 = None  # or handle empty data gracefully
+
+
+
+    # Mistral summary
     posts_text = " ".join(titles)
-    prompt = f"Summarize the following Reddit posts:\n{posts_text}. \n Do not answer in bullet points or refer to any specific post. Summarize them altogether."
-    summary = query_mistral(prompt, max_tokens=150)
+    prompt = f"IN exactly 3 short sentences summarise the overall sentiment of the following reddit posts :\n{posts_text}."
+    summary = query_mistral(
+        prompt, 
+        max_tokens=req.max_tokens, 
+        temperature=req.temperature
+    )
 
     return JSONResponse(content={
         "summary": summary,
         "sentiment_graph": img_base64,
-        #"counts": counts
     })

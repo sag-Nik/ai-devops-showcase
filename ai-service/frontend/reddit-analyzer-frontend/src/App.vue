@@ -1,6 +1,5 @@
 <template>
   <div id="app" class="app-container">
-    <h1>Reddit Sentiment & Summary Analyzer</h1>
     <SubredditForm />
   </div>
 </template>
