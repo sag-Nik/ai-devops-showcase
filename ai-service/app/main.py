@@ -93,7 +93,7 @@ def analyze_subreddit_stream(req: SubredditRequest):
     plt.ylabel("Number of posts")
     plt.tight_layout()
     graph_file = f"{req.subreddit}_sentiment.png"
-    plt.savefig(graph_file)
+    #plt.savefig(graph_file)
     plt.close()
 
     # Mistral streaming
